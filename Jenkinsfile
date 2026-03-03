@@ -11,6 +11,10 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    environment {
+        REVISION = '1.0-SNAPSHOT'
+    }
+
     stages {
         stage('Security: Gitleaks Scan') {
             steps {
@@ -24,16 +28,15 @@ pipeline {
         stage('Install Root POM') {
             steps {
                 echo "Installing Root POM to local repository..."
-                sh 'mvn clean install -N' 
+                sh "mvn clean install -N -Drevision=${REVISION}" 
             }
         }
 
         stage('Build Common Library') {
             steps {
-                
                 dir('common-library') { 
                     echo "Building and installing common-library to local Maven repo..."
-                    sh 'mvn clean install -DskipTests'
+                    sh "mvn clean install -DskipTests -Drevision=${REVISION}"
                 }
             }
         }
@@ -60,14 +63,13 @@ pipeline {
                             stage('Test & Coverage') {
                                 steps {
                                     dir("${SERVICE}") {
-                                        sh 'mvn clean test jacoco:report'
+                                        sh "mvn clean test jacoco:report -Drevision=${REVISION}"
                                     }
                                 }
                                 post {
                                     always {
                                         dir("${SERVICE}") {
                                             junit 'target/surefire-reports/*.xml'
-
                                             jacoco(
                                                 execPattern: 'target/jacoco.exec',
                                                 classPattern: 'target/classes',
@@ -85,7 +87,7 @@ pipeline {
                                 steps {
                                     dir("${SERVICE}") {
                                         withSonarQubeEnv('SonarQube-Server') {
-                                            sh 'mvn sonar:sonar'
+                                            sh "mvn sonar:sonar -Drevision=${REVISION}"
                                         }
                                     }
                                 }
@@ -94,7 +96,7 @@ pipeline {
                             stage('Build') {
                                 steps {
                                     dir("${SERVICE}") {
-                                        sh 'mvn package -DskipTests'
+                                        sh "mvn package -DskipTests -Drevision=${REVISION}"
                                     }
                                 }
                             }
