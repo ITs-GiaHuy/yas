@@ -21,6 +21,16 @@ pipeline {
             }
         }
 
+        stage('Build Common Library') {
+            steps {
+                
+                dir('common-library') { 
+                    echo "Building and installing common-library to local Maven repo..."
+                    sh 'mvn clean install -DskipTests'
+                }
+            }
+        }
+
         stage('Monorepo Services CI') {
             matrix {
                 axes {
