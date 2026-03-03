@@ -28,16 +28,16 @@ pipeline {
         stage('Install Root POM') {
             steps {
                 echo "Installing Root POM to local repository..."
-                sh "mvn clean install -N -Drevision=${REVISION}" 
+                // Thêm cờ -U để force update, xóa cache lỗi cũ
+                sh "mvn clean install -N -U -Drevision=${REVISION}" 
             }
         }
 
         stage('Build Common Library') {
             steps {
-                dir('common-library') { 
-                    echo "Building and installing common-library to local Maven repo..."
-                    sh "mvn clean install -DskipTests -Drevision=${REVISION}"
-                }
+                // Không dùng dir('common-library') nữa, chạy từ ROOT bằng -pl
+                echo "Building and installing common-library to local Maven repo..."
+                sh "mvn clean install -pl common-library -am -DskipTests -U -Drevision=${REVISION}"
             }
         }
 
@@ -62,12 +62,12 @@ pipeline {
                         stages {
                             stage('Test & Coverage') {
                                 steps {
-                                    dir("${SERVICE}") {
-                                        sh "mvn clean test jacoco:report -Drevision=${REVISION}"
-                                    }
+                                    // Chạy từ ROOT, dùng -pl để build riêng service đó
+                                    sh "mvn clean test jacoco:report -pl ${SERVICE} -U -Drevision=${REVISION}"
                                 }
                                 post {
                                     always {
+                                        // Vẫn giữ dir() ở đây để Jenkins tìm đúng đường dẫn file report
                                         dir("${SERVICE}") {
                                             junit 'target/surefire-reports/*.xml'
                                             jacoco(
@@ -85,19 +85,17 @@ pipeline {
                             
                             stage('Code Quality & SAST') {
                                 steps {
-                                    dir("${SERVICE}") {
-                                        withSonarQubeEnv('SonarQube-Server') {
-                                            sh "mvn sonar:sonar -Drevision=${REVISION}"
-                                        }
+                                    withSonarQubeEnv('SonarQube-Server') {
+                                        // Chạy từ ROOT
+                                        sh "mvn sonar:sonar -pl ${SERVICE} -Drevision=${REVISION}"
                                     }
                                 }
                             }
 
                             stage('Build') {
                                 steps {
-                                    dir("${SERVICE}") {
-                                        sh "mvn package -DskipTests -Drevision=${REVISION}"
-                                    }
+                                    // Chạy từ ROOT
+                                    sh "mvn package -DskipTests -pl ${SERVICE} -Drevision=${REVISION}"
                                 }
                             }
                         }
