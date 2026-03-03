@@ -21,6 +21,13 @@ pipeline {
             }
         }
 
+        stage('Install Root POM') {
+            steps {
+                echo "Installing Root POM to local repository..."
+                sh 'mvn clean install -N' 
+            }
+        }
+
         stage('Build Common Library') {
             steps {
                 
