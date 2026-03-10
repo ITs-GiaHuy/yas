@@ -28,12 +28,14 @@ pipeline {
         stage('Install Root POM') {
             steps {
                 echo "Installing Root POM to local repository..."
+                // Thêm cờ -U để force update, xóa cache lỗi cũ
                 sh "mvn clean install -N -U -Drevision=${REVISION}" 
             }
         }
 
         stage('Build Common Library') {
             steps {
+                // Không dùng dir('common-library') nữa, chạy từ ROOT bằng -pl
                 echo "Building and installing common-library to local Maven repo..."
                 sh "mvn clean install -pl common-library -am -DskipTests -U -Drevision=${REVISION}"
             }
@@ -53,47 +55,49 @@ pipeline {
                 }
                 
                 stages {
-                    stage('Test & Coverage - ${SERVICE}') {
+                    stage('Service CI') {
                         when { 
                             changeset "${SERVICE}/**" 
                         }
-                        steps {
-                            sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
-                        }
-                        post {
-                            always {
-                                dir("${SERVICE}") {
-                                    junit 'target/surefire-reports/*.xml'
-                                    jacoco(
-                                        execPattern: 'target/jacoco.exec',
-                                        classPattern: 'target/classes',
-                                        sourcePattern: 'src/main/java',
-                                        inclusionPattern: '**/*.class',
-                                        minimumLineCoverage: '70', 
-                                        changeBuildStatus: true
-                                    )
+                        stages {
+                            stage('Test & Coverage') {
+                                steps {
+                                    // Chạy từ ROOT, dùng -pl để build riêng service đó
+                                    sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                                }
+                                post {
+                                    always {
+                                        // Vẫn giữ dir() ở đây để Jenkins tìm đúng đường dẫn file report
+                                        dir("${SERVICE}") {
+                                            junit 'target/surefire-reports/*.xml'
+                                            jacoco(
+                                                execPattern: 'target/jacoco.exec',
+                                                classPattern: 'target/classes',
+                                                sourcePattern: 'src/main/java',
+                                                inclusionPattern: '**/*.class',
+                                                minimumLineCoverage: '70', 
+                                                changeBuildStatus: true
+                                            )
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    }
-                    
-                    stage('Code Quality & SAST - ${SERVICE}') {
-                        when { 
-                            changeset "${SERVICE}/**" 
-                        }
-                        steps {
-                            withSonarQubeEnv('SonarQube-Server') {
-                                sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                            
+                            stage('Code Quality & SAST') {
+                                steps {
+                                    withSonarQubeEnv('SonarQube-Server') {
+                                        // Chạy từ ROOT
+                                        sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                                    }
+                                }
                             }
-                        }
-                    }
 
-                    stage('Build - ${SERVICE}') {
-                        when { 
-                            changeset "${SERVICE}/**" 
-                        }
-                        steps {
-                            sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                            stage('Build') {
+                                steps {
+                                    // Chạy từ ROOT
+                                    sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                                }
+                            }
                         }
                     }
                 }
