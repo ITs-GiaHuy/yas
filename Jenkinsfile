@@ -28,14 +28,12 @@ pipeline {
         stage('Install Root POM') {
             steps {
                 echo "Installing Root POM to local repository..."
-                // Thêm cờ -U để force update, xóa cache lỗi cũ
                 sh "mvn clean install -N -U -Drevision=${REVISION}" 
             }
         }
 
         stage('Build Common Library') {
             steps {
-                // Không dùng dir('common-library') nữa, chạy từ ROOT bằng -pl
                 echo "Building and installing common-library to local Maven repo..."
                 sh "mvn clean install -pl common-library -am -DskipTests -U -Drevision=${REVISION}"
             }
@@ -62,12 +60,10 @@ pipeline {
                         stages {
                             stage('Test & Coverage') {
                                 steps {
-                                    // Chạy từ ROOT, dùng -pl để build riêng service đó
                                     sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                 }
                                 post {
                                     always {
-                                        // Vẫn giữ dir() ở đây để Jenkins tìm đúng đường dẫn file report
                                         dir("${SERVICE}") {
                                             junit 'target/surefire-reports/*.xml'
                                             jacoco(
@@ -86,7 +82,6 @@ pipeline {
                             stage('Code Quality & SAST') {
                                 steps {
                                     withSonarQubeEnv('SonarQube-Server') {
-                                        // Chạy từ ROOT
                                         sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                     }
                                 }
@@ -94,7 +89,6 @@ pipeline {
 
                             stage('Build') {
                                 steps {
-                                    // Chạy từ ROOT
                                     sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                 }
                             }
