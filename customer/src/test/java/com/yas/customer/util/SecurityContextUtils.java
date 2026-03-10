@@ -13,6 +13,8 @@ public class SecurityContextUtils {
     private SecurityContextUtils() {
     }
 
+    // Add comment to explain the purpose of this method
+
     public static void setUpSecurityContext(String userName) {
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn(userName);
