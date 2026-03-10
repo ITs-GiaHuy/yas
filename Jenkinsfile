@@ -53,45 +53,47 @@ pipeline {
                 }
                 
                 stages {
-                    stage('Service CI - ${SERVICE}') {
+                    stage('Test & Coverage - ${SERVICE}') {
                         when { 
                             changeset "${SERVICE}/**" 
                         }
-                        stages {
-                            stage('Test & Coverage') {
-                                steps {
-                                    sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
-                                }
-                                post {
-                                    always {
-                                        dir("${SERVICE}") {
-                                            junit 'target/surefire-reports/*.xml'
-                                            jacoco(
-                                                execPattern: 'target/jacoco.exec',
-                                                classPattern: 'target/classes',
-                                                sourcePattern: 'src/main/java',
-                                                inclusionPattern: '**/*.class',
-                                                minimumLineCoverage: '70', 
-                                                changeBuildStatus: true
-                                            )
-                                        }
-                                    }
+                        steps {
+                            sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
+                        }
+                        post {
+                            always {
+                                dir("${SERVICE}") {
+                                    junit 'target/surefire-reports/*.xml'
+                                    jacoco(
+                                        execPattern: 'target/jacoco.exec',
+                                        classPattern: 'target/classes',
+                                        sourcePattern: 'src/main/java',
+                                        inclusionPattern: '**/*.class',
+                                        minimumLineCoverage: '70', 
+                                        changeBuildStatus: true
+                                    )
                                 }
                             }
-                            
-                            stage('Code Quality & SAST') {
-                                steps {
-                                    withSonarQubeEnv('SonarQube-Server') {
-                                        sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
-                                    }
-                                }
+                        }
+                    }
+                    
+                    stage('Code Quality & SAST - ${SERVICE}') {
+                        when { 
+                            changeset "${SERVICE}/**" 
+                        }
+                        steps {
+                            withSonarQubeEnv('SonarQube-Server') {
+                                sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                             }
+                        }
+                    }
 
-                            stage('Build') {
-                                steps {
-                                    sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
-                                }
-                            }
+                    stage('Build - ${SERVICE}') {
+                        when { 
+                            changeset "${SERVICE}/**" 
+                        }
+                        steps {
+                            sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                         }
                     }
                 }
