@@ -53,7 +53,7 @@ pipeline {
                 }
                 
                 stages {
-                    stage('Service CI') {
+                    stage('Service CI - ${SERVICE}') {
                         when { 
                             changeset "${SERVICE}/**" 
                         }
