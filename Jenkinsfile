@@ -63,7 +63,7 @@ pipeline {
                             stage('Test & Coverage') {
                                 steps {
                                     // Chạy từ ROOT, dùng -pl để build riêng service đó
-                                    sh "mvn clean test jacoco:report -pl ${SERVICE} -U -Drevision=${REVISION}"
+                                    sh "mvn clean test jacoco:report -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                 }
                                 post {
                                     always {
@@ -87,7 +87,7 @@ pipeline {
                                 steps {
                                     withSonarQubeEnv('SonarQube-Server') {
                                         // Chạy từ ROOT
-                                        sh "mvn sonar:sonar -pl ${SERVICE} -Drevision=${REVISION}"
+                                        sh "mvn sonar:sonar -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                     }
                                 }
                             }
@@ -95,7 +95,7 @@ pipeline {
                             stage('Build') {
                                 steps {
                                     // Chạy từ ROOT
-                                    sh "mvn package -DskipTests -pl ${SERVICE} -Drevision=${REVISION}"
+                                    sh "mvn package -DskipTests -pl ${SERVICE} -am -U -Drevision=${REVISION}"
                                 }
                             }
                         }
