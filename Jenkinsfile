@@ -49,7 +49,7 @@ pipeline {
                     }
                 }
                 stages {
-                    stage('Java CI Workflow') {
+                    stage('Java CI - ${SERVICE}') {
                         when { 
                             anyOf {
                                 changeset pattern: "${SERVICE}/**/*", comparator: 'GLOB'
