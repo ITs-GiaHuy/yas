@@ -47,6 +47,7 @@ class CartItemServiceTest {
     @Spy
     private CartItemMapper cartItemMapper = new CartItemMapper();
 
+//  @Spy
     @InjectMocks
     private CartItemService cartItemService;
 
