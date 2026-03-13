@@ -48,8 +48,11 @@ pipeline {
                         }
                         steps {
                             // Run tests and generate coverage
-                            sh "mvn clean test -pl ${SERVICE} -am"
-                            
+                            sh "mvn -Drevision=1.0-SNAPSHOT clean test -pl ${SERVICE} -am"
+
+                            // Install artifacts to local Maven repository for downstream tools (Snyk, Sonar, etc.)
+                            sh "mvn -Drevision=1.0-SNAPSHOT install -DskipTests -pl ${SERVICE} -am"
+
                             // Run SonarQube analysis
                             dir("${SERVICE}") {
                                 withSonarQubeEnv('SonarCloud') {
@@ -61,7 +64,7 @@ pipeline {
                                     """
                                 }
                             }
-                            
+
                             // Run Snyk security scan
                             dir("${SERVICE}") {
                                 withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
