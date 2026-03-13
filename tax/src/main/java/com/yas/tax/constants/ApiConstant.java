@@ -9,6 +9,7 @@ public final class ApiConstant {
 // just test
 // Standard API response codes and messages
 // haha
+// Standard API response codes and messages
     public static final String CODE_200 = "200";
     public static final String OK = "Ok";
     public static final String CODE_404 = "404";

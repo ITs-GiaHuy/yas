@@ -8,6 +8,7 @@ import styles from '../../styles/Filter.module.css';
 // currentFilter: string;
 //  data: any[];
 // hahaha
+// just test
 type Props = { filter: Filter };
 
 const Filter = ({ filter }: Props) => {
