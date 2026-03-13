@@ -36,6 +36,7 @@ public class CheckoutController {
     public ResponseEntity<CheckoutVm> createCheckout(@Valid @RequestBody CheckoutPostVm checkoutPostVm) {
         return ResponseEntity.ok(checkoutService.createCheckout(checkoutPostVm));
     }
+    // Update the status of an existing checkout
 
     @PutMapping("/storefront/checkouts/status")
     public ResponseEntity<Long> updateCheckoutStatus(@Valid @RequestBody CheckoutStatusPutVm checkoutStatusPutVm) {
