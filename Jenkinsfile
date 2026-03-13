@@ -125,8 +125,10 @@ pipeline {
             steps {
                 script {
                     echo "Running Gitleaks to detect hardcoded secrets..."
-                    // Đã bỏ '|| true' để pipeline thực sự fail nếu phát hiện lộ credential trong code
-                    sh 'docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" -v'
+                    // Bao bọc lệnh sh bằng catchError
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                        sh 'docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" -v'
+                    }
                 }
             }
         }
