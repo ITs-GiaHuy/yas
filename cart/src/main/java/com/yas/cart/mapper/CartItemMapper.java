@@ -18,6 +18,7 @@ public class CartItemMapper {
     }
 
     // Chuyển đổi từ CartItemPostVm sang CartItem, gán customerId từ currentUserId
+    // currentUserId được lấy từ SecurityContext trong service layer, không nên truyền vào CartItemPostVm vì nó không phải là dữ liệu đầu vào của client
 
     public CartItem toCartItem(CartItemPostVm cartItemPostVm, String currentUserId) {
         return CartItem
