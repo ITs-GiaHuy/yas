@@ -7,6 +7,7 @@ import styles from '../../styles/Filter.module.css';
 //  filter: Filter;
 // currentFilter: string;
 //  data: any[];
+// hahaha
 type Props = { filter: Filter };
 
 const Filter = ({ filter }: Props) => {
