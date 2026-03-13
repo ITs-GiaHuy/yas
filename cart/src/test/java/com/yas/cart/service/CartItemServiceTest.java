@@ -51,6 +51,7 @@ class CartItemServiceTest {
     @InjectMocks
     private CartItemService cartItemService;
 
+//    @BeforeEach
     @BeforeEach
     void setUp() {
         Mockito.reset(cartItemRepository, productService);
