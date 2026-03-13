@@ -227,11 +227,22 @@ pipeline {
                                 '''
                             }
 
+                            // // 3. SonarQube Scan
+                            // withSonarQubeEnv('SonarCloud') {
+                            //     sh """
+                            //         mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                            //         -pl ${SERVICE} -am \
+                            //         -Dsonar.projectKey=ITs-GiaHuy_yas \
+                            //         -Dsonar.organization=its-giahuy \
+                            //         -Dsonar.host.url=https://sonarcloud.io
+                            //     """
+                            // }
                             // 3. SonarQube Scan
                             withSonarQubeEnv('SonarCloud') {
                                 sh """
                                     mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                    -pl ${SERVICE} -am \
+                                    -pl ${SERVICE} \
+                                    -Dsonar.working.directory=target/sonar-${SERVICE} \
                                     -Dsonar.projectKey=ITs-GiaHuy_yas \
                                     -Dsonar.organization=its-giahuy \
                                     -Dsonar.host.url=https://sonarcloud.io
