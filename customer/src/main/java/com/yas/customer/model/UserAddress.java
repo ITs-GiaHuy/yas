@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 // hahah
+// just test
 @Entity
 @Table(name = "user_address")
 @Getter
