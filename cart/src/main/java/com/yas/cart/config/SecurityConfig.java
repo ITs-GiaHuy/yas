@@ -19,6 +19,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+// Cấu hình bảo mật cho ứng dụng
         return http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/prometheus", "/actuator/health/**",
