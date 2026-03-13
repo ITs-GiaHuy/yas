@@ -21,6 +21,7 @@ public class CartItemMapper {
     // currentUserId được lấy từ SecurityContext trong service layer, không nên truyền vào CartItemPostVm vì nó không phải là dữ liệu đầu vào của client
 
     public CartItem toCartItem(CartItemPostVm cartItemPostVm, String currentUserId) {
+        // Tạo một CartItem mới với customerId được gán từ currentUserId, productId và quantity được lấy từ CartItemPostVm
         return CartItem
             .builder()
             .customerId(currentUserId)
