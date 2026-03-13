@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
+// Cấu hình Swagger/OpenAPI cho tài liệu API
 @OpenAPIDefinition(info = @Info(title = "Product Service API", description = "Product API documentation",
     version = "1.0"), security = @SecurityRequirement(name = "oauth2_bearer"),
     servers = {@Server(url = "${server.servlet.context-path}", description = "Default Server URL")})
