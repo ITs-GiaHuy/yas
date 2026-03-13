@@ -169,15 +169,13 @@ pipeline {
                                 }
                             }
                             
-                            // BƯỚC 3: Chạy Snyk ở thư mục gốc (KHÔNG dùng dir)
-                            withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                withEnv(['MAVEN_OPTS=-Drevision=1.0-SNAPSHOT']) {
-                                    // Đảm bảo cấp quyền thực thi cho file mvnw ở mọi nơi (tránh lỗi -13 EACCES)
+                            dir("${SERVICE}") {
+                                withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                                    // Đảm bảo quyền thực thi cho mvnw trong thư mục hiện tại
                                     sh "chmod +x mvnw || true"
-                                    sh "chmod +x ${SERVICE}/mvnw || true"
                                     
-                                    // Chạy Snyk trỏ đích danh vào pom.xml của service
-                                    sh "npx snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
+                                    // Chạy Snyk và truyền trực tiếp -Drevision xuống Maven
+                                    sh "npx snyk test --file=pom.xml --severity-threshold=high -- -Drevision=1.0-SNAPSHOT"
                                 }
                             }
                         }
