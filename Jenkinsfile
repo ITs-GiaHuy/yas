@@ -65,8 +65,10 @@ pipeline {
                             // Run Snyk security scan
                             dir("${SERVICE}") {
                                 withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                    sh "chmod +x mvnw || true"
-                                    sh "npx snyk test --file=pom.xml --severity-threshold=high"
+                                    withEnv(['MAVEN_OPTS=-Drevision=1.0-SNAPSHOT']) {
+                                        sh "chmod +x mvnw || true"
+                                        sh "npx snyk test --file=pom.xml --severity-threshold=high"
+                                    }
                                 }
                             }
                         }
