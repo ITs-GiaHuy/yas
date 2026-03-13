@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class DatabaseAutoConfig {
 
+// hahah
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> {
