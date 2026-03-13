@@ -60,7 +60,7 @@ class CartItemServiceTest {
 
     private static final String CURRENT_USER_ID_SAMPLE = "userId";
     private static final Long PRODUCT_ID_SAMPLE = 1L;
-
+//   private static final String CURRENT_USER_ID_SAMPLE = "userId";
     @Nested
     class AddCartItemTest {
         private CartItemPostVm.CartItemPostVmBuilder cartItemPostVmBuilder;
