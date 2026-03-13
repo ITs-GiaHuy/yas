@@ -3,6 +3,7 @@ import { Dropdown, Form } from 'react-bootstrap';
 import { Filter } from '../../modules/catalog/models/Filter';
 import styles from '../../styles/Filter.module.css';
 
+// type Props = {
 type Props = { filter: Filter };
 
 const Filter = ({ filter }: Props) => {
