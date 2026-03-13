@@ -17,6 +17,7 @@ abstract class AbstractCircuitBreakFallbackHandler {
         throw throwable;
     }
 
+// KAKAK
     protected <T> T handleTypedFallback(Throwable throwable) throws Throwable {
         handleError(throwable);
         return null;
