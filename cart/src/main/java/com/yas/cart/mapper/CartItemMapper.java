@@ -17,6 +17,8 @@ public class CartItemMapper {
             .build();
     }
 
+    // Chuyển đổi từ CartItemPostVm sang CartItem, gán customerId từ currentUserId
+
     public CartItem toCartItem(CartItemPostVm cartItemPostVm, String currentUserId) {
         return CartItem
             .builder()
