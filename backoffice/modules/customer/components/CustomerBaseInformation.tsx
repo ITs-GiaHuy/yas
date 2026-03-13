@@ -9,6 +9,7 @@ type Props = {
   customer?: Customer;
 };
 
+// This component is used in both create and edit customer form, so we need to make the customer prop optional
 const CustomerBaseInformation = ({ register, errors, customer }: Props) => {
   return (
     <>
