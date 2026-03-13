@@ -27,6 +27,7 @@ public class UserAddress extends AbstractAuditEntity {
     private Long id;
 
 //   private String name;
+//  private String phone;
     private String userId;
 
     private Long addressId;
