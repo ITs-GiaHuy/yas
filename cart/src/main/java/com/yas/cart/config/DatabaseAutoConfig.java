@@ -19,6 +19,7 @@ public class DatabaseAutoConfig {
 // hahah
 // just test
 // Configure AuditorAware to automatically set createdBy and lastModifiedBy fields
+//
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> {

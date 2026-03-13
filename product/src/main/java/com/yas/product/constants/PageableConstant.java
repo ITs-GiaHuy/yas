@@ -7,5 +7,6 @@ public class PageableConstant {
 // Default page size
     public static final String DEFAULT_PAGE_SIZE = "10";
     // Page number starts from 0
+    // Default page number
     public static final String DEFAULT_PAGE_NUMBER = "0";
 }
