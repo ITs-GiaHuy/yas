@@ -171,18 +171,12 @@ pipeline {
                                         }
                                     }
                                     
-                                    // BƯỚC 3: Chạy Snyk bên trong thư mục của service
-                                    // BƯỚC 3: Chạy Snyk bên trong thư mục của service
-                                    dir("${SERVICE}") {
-                                        withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                            // 1. Cấp quyền thực thi cho file mvnw ở thư mục gốc (../mvnw) 
-                                            // hoặc thư mục hiện tại (mvnw) nếu có, dùng "|| true" để không báo lỗi nếu file không tồn tại
-                                            sh 'chmod +x ../mvnw || true'
-                                            sh 'chmod +x mvnw || true'
-                                            
-                                            // 2. Chạy Snyk (Bạn có thể bỏ cờ -d đi được rồi cho log đỡ dài)
-                                            sh 'npx snyk test --all-projects --severity-threshold=high'
-                                        }
+                                    withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                                        // Đảm bảo cấp quyền cho mvnw ở thư mục gốc
+                                        sh 'chmod +x mvnw || true'
+                                        
+                                        // Chạy Snyk trỏ đích danh vào pom.xml của service đang build
+                                        sh "npx snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
                                     }
                                 }
                                 post {
