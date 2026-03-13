@@ -172,11 +172,13 @@ pipeline {
                                     }
                                     
                                     withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                        // Đảm bảo cấp quyền cho mvnw ở thư mục gốc
-                                        sh 'chmod +x mvnw || true'
                                         
-                                        // Chạy Snyk trỏ đích danh vào pom.xml của service đang build
-                                        sh "npx snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
+                                        withEnv(['MAVEN_OPTS=-Drevision=1.0-SNAPSHOT']) {
+                                            
+                                            // Thêm cờ --command=mvn để bỏ qua file mvnw, triệt tiêu hoàn toàn lỗi EACCES (-13)
+                                            sh "npx snyk test --file=${SERVICE}/pom.xml --command=mvn --severity-threshold=high"
+                                            
+                                        }
                                     }
                                 }
                                 post {
