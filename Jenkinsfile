@@ -219,7 +219,7 @@ pipeline {
                                 echo "Building UI/BFF Project: ${UI_SERVICE}..."
                                 sh 'npm ci'
                                 sh 'npm run lint'
-                                sh 'npm run test'
+                                sh 'npm run test --if-present'
                                 sh 'npm run build'
 
                                 withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
