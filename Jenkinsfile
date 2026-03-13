@@ -105,7 +105,6 @@
 //         }
 //     }
 // }
-
 pipeline {
     agent any
     
@@ -125,26 +124,9 @@ pipeline {
             steps {
                 script {
                     echo "Running Gitleaks to detect hardcoded secrets..."
-                    // Bao bọc lệnh sh bằng catchError
                     catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                         sh 'docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" -v'
                     }
-                }
-            }
-        }
-
-        stage('Install Root POM') {
-            steps {
-                echo "Installing Root POM to local repository..."
-                sh 'mvn clean install -N' 
-            }
-        }
-
-        stage('Build Common Library') {
-            steps {
-                dir('common-library') { 
-                    echo "Building and installing common-library to local Maven repo..."
-                    sh 'mvn clean install -DskipTests'
                 }
             }
         }
@@ -163,30 +145,32 @@ pipeline {
                 
                 stages {
                     stage('Java CI') {
+                        // Cú pháp changeset CHUẨN để bắt sự thay đổi của service
                         when { 
                             anyOf {
-                                changeset "${SERVICE}/**"
-                                changeset "common-library/**"
-                                changeset "pom.xml"
+                                changeset pattern: "${SERVICE}/**/*", comparator: 'GLOB'
+                                changeset pattern: "common-library/**/*", comparator: 'GLOB'
+                                changeset pattern: "pom.xml", comparator: 'GLOB'
                             }
                         }
                         stages {
                             stage('Build, Test, SAST & Coverage') {
                                 steps {
+                                    // BƯỚC 1: Build ở thư mục gốc (không dùng dir) để Maven resolve dependencies đúng cách
+                                    sh "mvn clean verify -pl ${SERVICE} -am"
+                                    
+                                    // BƯỚC 2: Chạy SonarQube ở thư mục gốc, chỉ định đúng service
+                                    withSonarQubeEnv('SonarCloud') {
+                                        sh """
+                                            mvn sonar:sonar -pl ${SERVICE} \
+                                            -Dsonar.projectKey=ITs-GiaHuy_yas \
+                                            -Dsonar.organization=its-giahuy \
+                                            -Dsonar.host.url=https://sonarcloud.io
+                                        """
+                                    }
+                                    
+                                    // BƯỚC 3: Chạy Snyk bên trong thư mục của service
                                     dir("${SERVICE}") {
-                                        // Chạy SonarQube & Test
-                                        withSonarQubeEnv('SonarCloud') {
-                                            // Thay YOUR_PROJECT_KEY và YOUR_ORG_KEY bằng mã thực tế của nhóm bạn trên SonarCloud
-                                            sh """
-                                                mvn clean verify sonar:sonar \
-                                                -Dsonar.projectKey=ITs-GiaHuy_yas \
-                                                -Dsonar.organization=its-giahuy \
-                                                -Dsonar.host.url=https://sonarcloud.io
-                                            """
-                                        }
-                                        
-                                        // BỔ SUNG: Chạy Snyk để scan lỗ hổng thư viện (Yêu cầu 7c)
-                                        // Lưu ý: Cần cấu hình credential 'snyk-token' trên Jenkins
                                         withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
                                             sh 'npx snyk test --all-projects --severity-threshold=high'
                                         }
@@ -225,7 +209,7 @@ pipeline {
                 stages {
                     stage('Node.js CI') {
                         when { 
-                            changeset "${UI_SERVICE}/**" 
+                            changeset pattern: "${UI_SERVICE}/**/*", comparator: 'GLOB'
                         }
                         stages {
                             stage('Install, Lint, Test, Scan & Build') {
@@ -235,11 +219,9 @@ pipeline {
                                         sh 'npm ci'
                                         sh 'npm run lint'
                                         
-                                        // Đã mở comment để chạy test và build cho Frontend (Yêu cầu 5)
                                         sh 'npm run test'
                                         sh 'npm run build'
 
-                                        // BỔ SUNG: Chạy Snyk để scan package.json của Frontend
                                         withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
                                             sh 'npx snyk test'
                                         }
