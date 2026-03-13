@@ -5,6 +5,7 @@ import styles from '../../styles/Filter.module.css';
 
 // type Props = {
 //  filter: Filter;
+// currentFilter: string;
 type Props = { filter: Filter };
 
 const Filter = ({ filter }: Props) => {

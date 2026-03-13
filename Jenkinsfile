@@ -158,7 +158,8 @@ pipeline {
     }
 
     stages {
-        stage('Setup Tools & Pre-build Dependencies') {
+        // Tải Snyk CLI ngay từ đầu để dùng chung cho mọi Service, tránh lỗi quyền của npx
+        stage('Setup Tools') {
             steps {
                 script {
                     echo "Downloading Snyk CLI standalone binary..."
@@ -166,11 +167,6 @@ pipeline {
                         curl -s -Lo ./snyk https://github.com/snyk/snyk/releases/latest/download/snyk-linux
                         chmod +x ./snyk
                     '''
-                    
-                    echo "Dọn dẹp workspace và build cài đặt các module dùng chung..."
-                    // Dọn dẹp và cài toàn bộ dependencies vào local cache (~/.m2). 
-                    // Bỏ qua test ở bước này để chạy cực nhanh.
-                    sh 'mvn clean install -DskipTests'
                 }
             }
         }
@@ -183,6 +179,18 @@ pipeline {
                         sh 'docker run --rm -v "${WORKSPACE}:/work" -w /work zricethezav/gitleaks:latest detect --source="." --no-git --verbose'
                     }
                 }
+            }
+        }
+
+        stage('Pre-build Java Dependencies') {
+            when { 
+                anyOf {
+                    changeset pattern: "**/*.java", comparator: 'GLOB'
+                    changeset pattern: "**/pom.xml", comparator: 'GLOB'
+                }
+            }
+            steps {
+                sh "mvn clean install -DskipTests" 
             }
         }
 
@@ -207,10 +215,11 @@ pipeline {
                             }
                         }
                         steps {
-                            // 1. Chạy Verify (Test/Checkstyle). Đã BỎ 'clean' và '-am' để tránh đụng độ file
+                            // 1. Build & Test (Chạy từ root)
                             sh "mvn verify -pl ${SERVICE}"
                             
-                            // 2. Snyk Scan bằng Binary
+                            // 2. Snyk Scan bằng Binary. 
+                            // Thêm "|| true" để Snyk không ném exit code làm sập luồng chạy của JaCoCo phía sau.
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
                                 sh '''
                                     ./snyk auth $SNYK_TOKEN
@@ -222,7 +231,7 @@ pipeline {
                             withSonarQubeEnv('SonarCloud') {
                                 sh """
                                     mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                    -pl ${SERVICE} \
+                                    -pl ${SERVICE} -am \
                                     -Dsonar.projectKey=ITs-GiaHuy_yas \
                                     -Dsonar.organization=its-giahuy \
                                     -Dsonar.host.url=https://sonarcloud.io
@@ -235,6 +244,7 @@ pipeline {
                                 junit testResults: "${SERVICE}/target/surefire-reports/*.xml", allowEmptyResults: true
                                 
                                 // 5. JaCoCo Coverage (Yêu cầu > 70% mới pass)
+                                // Sử dụng dấu ** để plugin tự động quét và tìm đúng file jacoco.exec 
                                 jacoco(
                                     execPattern: "${SERVICE}/target/**/jacoco.exec",
                                     classPattern: "${SERVICE}/target/classes",
@@ -275,7 +285,7 @@ pipeline {
                                     sh 'npm run test' 
                                 }
                             }
-                            
+                            // Quét Snyk cho thư mục Frontend (chạy ở ngoài dir bằng binary đã tải)
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
                                 sh '''
                                     ./snyk auth $SNYK_TOKEN
@@ -289,3 +299,4 @@ pipeline {
         }
     }
 }
+

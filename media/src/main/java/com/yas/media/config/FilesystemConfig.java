@@ -10,6 +10,7 @@ public class FilesystemConfig {
 
 // hahah
 // just test
+// Directory to store media files
     @Value("${file.directory}")
     private String directory;
 
