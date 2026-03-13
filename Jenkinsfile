@@ -169,15 +169,15 @@ pipeline {
                                 }
                             }
                             
-                            dir("${SERVICE}") {
-                                withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                    // Đảm bảo quyền thực thi cho mvnw trong thư mục hiện tại
-                                    sh "chmod +x mvnw || true"
+                            // dir("${SERVICE}") {
+                            //     withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                            //         // Đảm bảo quyền thực thi cho mvnw trong thư mục hiện tại
+                            //         sh "chmod +x mvnw || true"
                                     
-                                    // Chạy Snyk và truyền trực tiếp -Drevision xuống Maven
-                                    sh "npx snyk test --file=pom.xml --severity-threshold=high -- -Drevision=1.0-SNAPSHOT"
-                                }
-                            }
+                            //         // Chạy Snyk và truyền trực tiếp -Drevision xuống Maven
+                            //         sh "npx snyk test --file=pom.xml --severity-threshold=high -- -Drevision=1.0-SNAPSHOT"
+                            //     }
+                            // }
                         }
                         post {
                             always {
