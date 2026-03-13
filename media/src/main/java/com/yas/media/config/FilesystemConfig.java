@@ -11,6 +11,7 @@ public class FilesystemConfig {
 // hahah
 // just test
 // Directory to store media files
+// This can be configured in application.properties or application.yml
     @Value("${file.directory}")
     private String directory;
 

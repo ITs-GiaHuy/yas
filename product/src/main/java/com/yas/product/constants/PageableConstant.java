@@ -4,6 +4,7 @@ public class PageableConstant {
 // hahah
 // just test
 // Default pageable parameters
+// Default page size
     public static final String DEFAULT_PAGE_SIZE = "10";
     // Page number starts from 0
     public static final String DEFAULT_PAGE_NUMBER = "0";

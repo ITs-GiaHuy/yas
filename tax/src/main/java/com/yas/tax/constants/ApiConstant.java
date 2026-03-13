@@ -6,6 +6,7 @@ public final class ApiConstant {
     public static final String COUNTRIES_URL = "/backoffice/countries";
 //    public static final String PROVINCES_URL = "/backoffice/provinces";
 // hahah
+// just test
     public static final String CODE_200 = "200";
     public static final String OK = "Ok";
     public static final String CODE_404 = "404";

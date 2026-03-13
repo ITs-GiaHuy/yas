@@ -30,6 +30,7 @@ public class CheckoutController {
 // hahah
 // just test
 // Create a new checkout
+// Update checkout status
     @PostMapping("/storefront/checkouts")
     public ResponseEntity<CheckoutVm> createCheckout(@Valid @RequestBody CheckoutPostVm checkoutPostVm) {
         return ResponseEntity.ok(checkoutService.createCheckout(checkoutPostVm));
