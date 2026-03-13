@@ -174,7 +174,7 @@ pipeline {
                                     // BƯỚC 3: Chạy Snyk bên trong thư mục của service
                                     dir("${SERVICE}") {
                                         withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                            sh 'npx snyk test --all-projects --severity-threshold=high'
+                                            sh 'npx snyk test -d --all-projects --severity-threshold=high'
                                         }
                                     }
                                 }
