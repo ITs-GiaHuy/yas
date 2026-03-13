@@ -157,7 +157,7 @@ pipeline {
                             stage('Build, Test, SAST & Coverage') {
                                 steps {
                                     // BƯỚC 1: Build ở thư mục gốc (không dùng dir) để Maven resolve dependencies đúng cách
-                                    sh "mvn clean verify -pl ${SERVICE} -am"
+                                    sh "mvn clean install -pl ${SERVICE} -am"
                                     
                                     // BƯỚC 2: Đã dùng dir() để di chuyển vào trong thư mục service trước khi quét SonarQube
                                     dir("${SERVICE}") {
