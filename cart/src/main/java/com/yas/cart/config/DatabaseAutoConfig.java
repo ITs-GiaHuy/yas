@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class DatabaseAutoConfig {
 
 // hahah
+//jja
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> {
