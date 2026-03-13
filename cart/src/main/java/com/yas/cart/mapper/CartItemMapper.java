@@ -30,6 +30,8 @@ public class CartItemMapper {
             .build();
     }
 
+    // Phương thức tiện ích để tạo CartItem từ productId và quantity, gán customerId từ currentUserId
+
     public CartItem toCartItem(String currentUserId, Long productId, int quantity) {
         // Tạo một CartItem mới với customerId được gán từ currentUserId, productId và quantity được truyền vào
         return CartItem
