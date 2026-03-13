@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(info = @Info(title = "Product Service API", description = "Product API documentation",
     version = "1.0"), security = @SecurityRequirement(name = "oauth2_bearer"),
     servers = {@Server(url = "${server.servlet.context-path}", description = "Default Server URL")})
+    // Cấu hình bảo mật OAuth2 cho Swagger UI
 @SecurityScheme(name = "oauth2_bearer", type = SecuritySchemeType.OAUTH2,
     flows = @OAuthFlows(authorizationCode = @OAuthFlow(
         authorizationUrl = "${springdoc.oauthflow.authorization-url}",
