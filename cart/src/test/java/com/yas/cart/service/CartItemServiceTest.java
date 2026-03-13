@@ -43,7 +43,7 @@ class CartItemServiceTest {
 
     @Mock
     private ProductService productService;
-
+//   @Mock
     @Spy
     private CartItemMapper cartItemMapper = new CartItemMapper();
 
