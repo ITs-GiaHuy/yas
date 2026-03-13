@@ -144,8 +144,8 @@ pipeline {
                 }
                 
                 stages {
-                    // Đã làm phẳng stage (bỏ bớt stage lồng nhau) để UI Jenkins đẹp hơn
-                    stage("Java CI: ${SERVICE}") {
+                    // Đã sửa lại thành chuỗi tĩnh cố định (bắt buộc trong Declarative Pipeline)
+                    stage('Java CI') {
                         when { 
                             anyOf {
                                 changeset pattern: "${SERVICE}/**/*", comparator: 'GLOB'
@@ -211,7 +211,8 @@ pipeline {
                     }
                 }
                 stages {
-                    stage("Node CI: ${UI_SERVICE}") {
+                    // Đã sửa lại thành chuỗi tĩnh cố định
+                    stage('Node.js CI') {
                         when { 
                             changeset pattern: "${UI_SERVICE}/**/*", comparator: 'GLOB'
                         }
