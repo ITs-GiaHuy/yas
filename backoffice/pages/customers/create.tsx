@@ -11,6 +11,7 @@ import { createCustomer } from 'modules/customer/services/CustomerService';
 
 
 // Trang tạo khách hàng mới, sử dụng react-hook-form để quản lý form và gọi API tạo khách hàng khi submit
+// Nếu tạo thành công, chuyển hướng về trang danh sách khách hàng, nếu có lỗi sẽ hiển thị thông báo lỗi
 const CustomerCreate: NextPage = () => {
   const router = useRouter();
   const {
