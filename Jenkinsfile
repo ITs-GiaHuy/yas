@@ -148,7 +148,6 @@
 //         }
 //     }
 // }
-
 pipeline {
     agent any
     
@@ -168,13 +167,12 @@ pipeline {
             steps {
                 script {
                     echo "Checking if Snyk CLI is installed..."
-                    // Kiểm tra xem lệnh snyk đã tồn tại trong PATH chưa
                     def snykExists = sh(script: 'command -v snyk', returnStatus: true) == 0
                     
                     if (!snykExists) {
                         echo "Snyk CLI not found. Installing via npm..."
                         sh 'npm install -g snyk'
-                        chmod +x ./snyk
+                        // BỎ chmod +x ./snyk đi vì npm đã tự cấu hình đường dẫn
                     } else {
                         echo "Snyk CLI is already installed. Skipping installation."
                     }
@@ -187,7 +185,8 @@ pipeline {
                 script {
                     echo "Running Gitleaks to detect hardcoded secrets..."
                     catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                        sh 'docker run --rm -v "${WORKSPACE}:/work" -w /work zricethezav/gitleaks:latest detect --source="." --verbose'
+                        // FIX: Đổi thành 3 nháy kép """ để không bị lỗi Groovy parsing "found 'work'"
+                        sh """docker run --rm -v "${WORKSPACE}:/work" -w /work zricethezav/gitleaks:latest detect --source="." --verbose"""
                     }
                 }
             }
@@ -210,7 +209,6 @@ pipeline {
                 axes {
                     axis {
                         name 'SERVICE'
-                        // Đã giữ nguyên danh sách service theo đúng ý bạn
                         values 'media', 'product', 'cart', 'order', 'payment', 
                                'search', 'customer', 'inventory', 'delivery', 
                                'location', 'promotion', 'rating', 
@@ -218,7 +216,7 @@ pipeline {
                     }
                 }
                 stages {
-                    stage('Build& Scan') {
+                    stage('Build & Scan') { // Đổi tên tĩnh để Matrix hiển thị đẹp trên UI
                         when { 
                             anyOf {
                                 changeset pattern: "${SERVICE}/**/*", comparator: 'GLOB'
@@ -230,20 +228,20 @@ pipeline {
                             // 1. Build & Test
                             sh "mvn verify -pl ${SERVICE}"
                             
-                            // // 2. Snyk Scan (Truyền token trực tiếp qua biến môi trường)
-                            // withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                            //     sh "SNYK_TOKEN=\$SNYK_TOKEN snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
-                            // }
+                            // FIX: Cấp quyền thực thi cho mvnw để Snyk không bị lỗi -13 Permission Denied
+                            sh "chmod +x mvnw || true" 
+                            sh "chmod +x ${SERVICE}/mvnw || true"
 
+                            // 2. Snyk Scan
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                sh '''
-                                    ./snyk auth $SNYK_TOKEN
-                                    ./snyk test --file=${SERVICE}/pom.xml --severity-threshold=high
-                                '''
+                                // FIX: Dùng """ và gọi 'snyk' thay vì './snyk'
+                                sh """
+                                    snyk auth \$SNYK_TOKEN
+                                    snyk test --file=${SERVICE}/pom.xml --severity-threshold=high
+                                """
                             }
 
-
-                            // 3. SonarQube Scan (Chạy bên trong thư mục con)
+                            // 3. SonarQube Scan
                             withSonarQubeEnv('SonarCloud') {
                                 dir("${SERVICE}") {
                                     sh """
@@ -283,7 +281,6 @@ pipeline {
                 axes {
                     axis {
                         name 'UI_SERVICE'
-                        // Đã giữ nguyên danh sách service Frontend theo đúng ý bạn
                         values 'storefront', 'backoffice'
                     }
                 }
@@ -301,12 +298,12 @@ pipeline {
                             }
                             
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                                // FIX: Dùng """ và gọi 'snyk' thay vì './snyk'
                                 sh """
-                                    ./snyk auth \$SNYK_TOKEN
-                                    ./snyk test --file=${UI_SERVICE}/package.json --severity-threshold=high
+                                    snyk auth \$SNYK_TOKEN
+                                    snyk test --file=${UI_SERVICE}/package.json --severity-threshold=high
                                 """
                             }
-
                         }
                     }
                 }

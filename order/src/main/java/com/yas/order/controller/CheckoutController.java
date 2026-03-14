@@ -50,6 +50,7 @@ public class CheckoutController {
         return ResponseEntity.ok(checkoutService.getCheckoutPendingStateWithItemsById(id));
     }
 
+//
     @PutMapping("/storefront/checkouts/{id}/payment-method")
     @ApiResponses(value = {
         @ApiResponse(responseCode = ApiConstant.CODE_200, description = ApiConstant.OK,
