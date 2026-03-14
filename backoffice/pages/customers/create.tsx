@@ -8,7 +8,7 @@ import CustomerInformation from 'modules/customer/components/CustomerInformation
 import { handleCreatingResponse } from '@commonServices/ResponseStatusHandlingService';
 import { CUSTOMER_URL } from '@constants/Common';
 import { createCustomer } from 'modules/customer/services/CustomerService';
-
+// just test
 const CustomerCreate: NextPage = () => {
   const router = useRouter();
   const {
