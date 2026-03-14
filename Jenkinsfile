@@ -174,6 +174,7 @@ pipeline {
                     if (!snykExists) {
                         echo "Snyk CLI not found. Installing via npm..."
                         sh 'npm install -g snyk'
+                        chmod +x ./snyk
                     } else {
                         echo "Snyk CLI is already installed. Skipping installation."
                     }
@@ -229,10 +230,18 @@ pipeline {
                             // 1. Build & Test
                             sh "mvn verify -pl ${SERVICE}"
                             
-                            // 2. Snyk Scan (Truyền token trực tiếp qua biến môi trường)
+                            // // 2. Snyk Scan (Truyền token trực tiếp qua biến môi trường)
+                            // withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                            //     sh "SNYK_TOKEN=\$SNYK_TOKEN snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
+                            // }
+
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                sh "SNYK_TOKEN=\$SNYK_TOKEN snyk test --file=${SERVICE}/pom.xml --severity-threshold=high"
+                                sh '''
+                                    ./snyk auth $SNYK_TOKEN
+                                    ./snyk test --file=${SERVICE}/pom.xml --severity-threshold=high
+                                '''
                             }
+
 
                             // 3. SonarQube Scan (Chạy bên trong thư mục con)
                             withSonarQubeEnv('SonarCloud') {
@@ -292,8 +301,12 @@ pipeline {
                             }
                             
                             withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                                sh "SNYK_TOKEN=\$SNYK_TOKEN snyk test --file=${UI_SERVICE}/package.json --severity-threshold=high"
+                                sh """
+                                    ./snyk auth \$SNYK_TOKEN
+                                    ./snyk test --file=${UI_SERVICE}/package.json --severity-threshold=high
+                                """
                             }
+
                         }
                     }
                 }
