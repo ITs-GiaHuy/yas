@@ -6,6 +6,7 @@ export const CartContext = createContext({
   numberCartItems: 0,
   fetchNumberCartItems: () => {},
 });
+// just test
 
 export function CartProvider({ children }: React.PropsWithChildren) {
   const [numberCartItems, setNumberCartItems] = useState(0);

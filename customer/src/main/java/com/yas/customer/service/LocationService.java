@@ -63,6 +63,7 @@ public class LocationService extends AbstractCircuitBreakFallbackHandler {
             .body(AddressDetailVm.class);
     }
 
+// hahah
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleAddressFallback")
     public AddressVm createAddress(AddressPostVm addressPostVm) {
