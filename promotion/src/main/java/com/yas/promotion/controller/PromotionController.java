@@ -1,5 +1,5 @@
 package com.yas.promotion.controller;
-
+// just test
 import com.yas.promotion.service.PromotionService;
 import com.yas.promotion.viewmodel.*;
 import com.yas.promotion.viewmodel.error.ErrorVm;

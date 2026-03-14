@@ -370,8 +370,8 @@ pipeline {
                         name 'SERVICE'
                         values 'media', 'product', 'cart', 'order', 'payment', 
                                'search', 'customer', 'inventory', 'delivery', 
-                               'identity', 'location', 'promotion', 'rating', 
-                               'recommendation', 'tax', 'webhook'
+                               'location', 'promotion', 'rating', 
+                               'recommendation', 'tax', 'webhook', 'backoffice-bff', 'storefront-bff'
                     }
                 }
                 stages {

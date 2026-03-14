@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
-
+// just test
 export default function AuthenticationInfo() {
   type AuthenticatedUser = {
     username: string;
