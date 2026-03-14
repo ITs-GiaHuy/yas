@@ -20,6 +20,7 @@ public class DatabaseAutoConfig {
 // just test
 // Configure AuditorAware to automatically set createdBy and lastModifiedBy fields
 // This implementation retrieves the current authenticated user's username from the SecurityContext.
+// If there is no authenticated user, it returns an empty string.
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> {
